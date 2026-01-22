@@ -1,0 +1,7 @@
+paddlepaddle
+paddleocr
+opencv-python
+numpy
+pillow
+python-docx
+streamlit
