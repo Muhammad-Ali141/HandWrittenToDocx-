@@ -1,6 +1,4 @@
 openai
-opencv-python
-numpy
 pillow
 python-docx
 streamlit

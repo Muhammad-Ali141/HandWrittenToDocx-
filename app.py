@@ -1,7 +1,6 @@
 import streamlit as st
 import os
 from ocr_engine import extract_text
-from image_utils import preprocess_image
 from document_generator import create_word
 
 st.set_page_config(page_title="Handwritten OCR to Word")
@@ -27,8 +26,7 @@ if uploaded_files:
         st.image(path, caption=file.name, use_container_width=True)
 
         with st.spinner(f"Extracting text from {file.name}..."):
-            processed = preprocess_image(path)
-            text = extract_text(processed)
+            text = extract_text(path)
 
         extracted_texts.append(text)
         image_paths.append(path)
