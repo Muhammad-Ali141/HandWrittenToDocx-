@@ -1,17 +1,35 @@
-from paddleocr import PaddleOCR
+import base64
+import streamlit as st
+from openai import OpenAI
 
-ocr = PaddleOCR(
-    use_angle_cls=True,
-    lang='en',
-    rec=True
+client = OpenAI(
+    api_key=st.secrets["api"]["qwen_api_key"],
+    base_url="https://dashscope-intl.aliyuncs.com/compatible-mode/v1",
+)
+
+PROMPT = (
+    "Extract all the handwritten text from this image exactly as written. "
+    "Preserve the structure, headings, bullet points, and layout as much as possible. "
+    "Do not summarize or interpret — just transcribe the text faithfully."
 )
 
 def extract_text(image_path):
-    result = ocr.ocr(image_path, cls=True)
+    with open(image_path, "rb") as f:
+        image_data = base64.b64encode(f.read()).decode("utf-8")
 
-    extracted_text = []
-    for line in result:
-        for word in line:
-            extracted_text.append(word[1][0])
+    ext = image_path.rsplit(".", 1)[-1].lower()
+    mime = "image/png" if ext == "png" else "image/jpeg"
 
-    return "\n".join(extracted_text)
+    response = client.chat.completions.create(
+        model="qwen-vl-max",
+        messages=[
+            {
+                "role": "user",
+                "content": [
+                    {"type": "image_url", "image_url": {"url": f"data:{mime};base64,{image_data}"}},
+                    {"type": "text", "text": PROMPT},
+                ],
+            }
+        ],
+    )
+    return response.choices[0].message.content

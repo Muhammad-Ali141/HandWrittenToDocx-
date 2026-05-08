@@ -1,5 +1,4 @@
-paddlepaddle
-paddleocr
+openai
 opencv-python
 numpy
 pillow
